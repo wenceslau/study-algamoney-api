@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-
 @ControllerAdvice
 public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -60,23 +58,18 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
-	
-	@ExceptionHandler({ DataIntegrityViolationException.class })
-	// @ResponseStatus(HttpStatus.NOT_FOUND)
-	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
-			WebRequest request) {
 
-		String messageUser = messageSource.getMessage("mensagem.operacaoNaoPermitida", null,
-				LocaleContextHolder.getLocale());
+	@ExceptionHandler({ DataIntegrityViolationException.class })
+	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,	WebRequest request) {
+		String messageUser = messageSource.getMessage("mensagem.operacaoNaoPermitida", null,LocaleContextHolder.getLocale());
 		String messageDeveloper = ExceptionUtils.getRootCauseMessage(ex);
 		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
 
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 
-	protected ResponseEntity<Object> handleMySQLIntegrityConstraintViolationException(
-			MySQLIntegrityConstraintViolationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-		// TODO Auto-generated method stub
+	@ExceptionHandler({ DataIntegrityViolationException.class })
+	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,HttpHeaders headers, HttpStatus status, WebRequest request) {
 		String messageUser = "Campo Obrigatorio";
 		String messageDeveloper = ex.getCause().toString();
 		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
