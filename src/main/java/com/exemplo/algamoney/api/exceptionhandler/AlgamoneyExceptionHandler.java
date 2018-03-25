@@ -31,52 +31,42 @@ public class AlgamoneyExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		// TODO Auto-generated method stub
-		String messageUser = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
-		String messageDeveloper = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
+
+		String mensagemUsuario = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
 
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		// TODO Auto-generated method stub
-		List<Erro> erros = criarListError(ex.getBindingResult());
+
+		List<Erro> erros = criarListDeErros(ex.getBindingResult());
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
 
 	@ExceptionHandler({ EmptyResultDataAccessException.class })
-	// @ResponseStatus(HttpStatus.NOT_FOUND)
 	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex,
 			WebRequest request) {
-
-		String messageUser = messageSource.getMessage("mensagem.recursoNaoEncontrado", null,
+		String mensagemUsuario = messageSource.getMessage("recurso.nao-encontrado", null,
 				LocaleContextHolder.getLocale());
-		String messageDeveloper = ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
-
+		String mensagemDesenvolvedor = ex.toString();
+		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
 
 	@ExceptionHandler({ DataIntegrityViolationException.class })
-	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,	WebRequest request) {
-		String messageUser = messageSource.getMessage("mensagem.operacaoNaoPermitida", null,LocaleContextHolder.getLocale());
-		String messageDeveloper = ExceptionUtils.getRootCauseMessage(ex);
-		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
-
+	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
+			WebRequest request) {
+		String mensagemUsuario = messageSource.getMessage("recurso.operacao-nao-permitida", null,
+				LocaleContextHolder.getLocale());
+		String mensagemDesenvolvedor = ExceptionUtils.getRootCauseMessage(ex);
+		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 
-	@ExceptionHandler({ DataIntegrityViolationException.class })
-	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,HttpHeaders headers, HttpStatus status, WebRequest request) {
-		String messageUser = "Campo Obrigatorio";
-		String messageDeveloper = ex.getCause().toString();
-		List<Erro> erros = Arrays.asList(new Erro(messageUser, messageDeveloper));
-		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
-	}
-
-	private List<Erro> criarListError(BindingResult bindingResult) {
+	private List<Erro> criarListDeErros(BindingResult bindingResult) {
 		List<Erro> erros = new ArrayList<>();
 
 		for (FieldError fiedlError : bindingResult.getFieldErrors()) {
