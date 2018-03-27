@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exemplo.algamoney.api.event.RecursoCriadoEvent;
 import com.exemplo.algamoney.api.model.Pessoa;
 import com.exemplo.algamoney.api.repository.PessoaRepository;
+import com.exemplo.algamoney.api.repository.filter.PessoaFilter;
 import com.exemplo.algamoney.api.service.PessoaService;
 
 @RestController
@@ -38,10 +39,16 @@ public class PessoaResource {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
+//	@RequestMapping
+//	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and #oauth2.hasScope('read')")
+//	public List<Pessoa> listar() {
+//		return pessoaRepository.findAll();
+//	}
+	
 	@RequestMapping
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and #oauth2.hasScope('read')")
-	public List<Pessoa> listar() {
-		return pessoaRepository.findAll();
+	public List<Pessoa> pesquisar(PessoaFilter pessoaFilter) {
+		return pessoaRepository.filtrar(pessoaFilter);
 	}
 
 	@PostMapping

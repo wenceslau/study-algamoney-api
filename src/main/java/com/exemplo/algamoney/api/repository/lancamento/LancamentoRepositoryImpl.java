@@ -73,7 +73,6 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 		return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter));
 	}
 
-
 	private Long total(LancamentoFilter lancamentoFilter) {
 		CriteriaBuilder builder = manager.getCriteriaBuilder();		
 		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
@@ -86,9 +85,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
 		
 		return manager.createQuery(criteria).getSingleResult();
 	}
-	
-	
-
+		
 	private void adicionarRestricosPaginacao(TypedQuery<?> query, Pageable pageable) {
 		int paginaAtual = pageable.getPageNumber();
 		int totalRegistroPorPagina = pageable.getPageSize();
