@@ -30,19 +30,23 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	private UserDetailsService userDetailService;
 
 	@Autowired
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {		
 		//auth.inMemoryAuthentication().withUser("admin").password("admin").roles("ROLE");
+		System.out.println("UserDet: "+userDetailService.toString());
 		auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
+		
+		System.out.println("passwordEncoder");
 		return new BCryptPasswordEncoder();
 	}
 
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
+		System.out.println("configure 3");
 		http.authorizeRequests()
 				.antMatchers("/categorias").permitAll()
 				.anyRequest().authenticated()
@@ -53,12 +57,14 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+		System.out.println("configure 4");
 		resources.stateless(true);
 	}
 	
 	
 	@Bean
 	public MethodSecurityExpressionHandler createExpressionHandler() {
+		System.out.println("createExpressionHandler");
 		return new OAuth2MethodSecurityExpressionHandler();
 	}
 	

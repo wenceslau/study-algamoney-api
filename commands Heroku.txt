@@ -1,0 +1,17 @@
+
+
+heroku login
+heroku create <nomeApp>
+heroku addons:create jawsdb <provisiona mysql>
+heroku config:get <nomeVariavel>
+heroku config:set <nomeVariavel=valorVariavel>
+heroku config <trazVariaveisDoAmbiente>
+
+Procfile -> web: java -Dserver.port=$PORT -Dspring.profiles.active=prod $JAVA_OPTS -jar target/algamoney*.jar
+
+git init
+git status
+git add .
+git commit -m "<descricaoCommit>"
+
+git push heroku master  - cria a app no heroku

@@ -1,1 +1,0 @@
-UPDATE pessoa SET cep = '38.400-123' WHERE codigo =1	
