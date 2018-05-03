@@ -1,5 +1,6 @@
 package com.exemplo.algamoney.api.resource;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,19 +13,26 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exemplo.algamoney.api.dto.LancamentoEstatisticaCategoria;
+import com.exemplo.algamoney.api.dto.LancamentoEstatisticaDia;
 import com.exemplo.algamoney.api.event.RecursoCriadoEvent;
 import com.exemplo.algamoney.api.exceptionhandler.AlgamoneyExceptionHandler.Erro;
 import com.exemplo.algamoney.api.model.Lancamento;
@@ -50,12 +58,37 @@ public class LancamentoResource {
 	@Autowired
 	private MessageSource messageSource;
 
+	@GetMapping("/relatorio/por-pessoa")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public ResponseEntity<byte[]> relatorioPorPessoa(
+			@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate inicio, 
+			@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd")  LocalDate fim) throws Exception{
+
+		byte[] relatorio = lancamentoService.relatorioPorPessoa(inicio, fim);	
+		
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+				.body(relatorio);
+	}
+
+	@GetMapping("/estatistica/por-categoria")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public List<LancamentoEstatisticaCategoria> porCategoria() {
+		return this.lancamentoRepository.porCategoria(LocalDate.now());
+	}
+
+	@GetMapping("/estatistica/por-dia")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public List<LancamentoEstatisticaDia> porDia() {
+		return this.lancamentoRepository.porDia(LocalDate.now());
+	}
+
 	@RequestMapping
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
 	public Page<Lancamento> pesquisar(LancamentoFilter lancamentoFilter, Pageable pageable) {
 		return lancamentoRepository.filtrar(lancamentoFilter, pageable);
 	}
-	
+
 	@RequestMapping(params = "resumo")
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
 	public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
@@ -97,7 +130,7 @@ public class LancamentoResource {
 
 		return ResponseEntity.badRequest().body(erros);
 	}
-	
+
 	@PutMapping("/{codigo}")
 	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_LANCAMENTO')")
 	public ResponseEntity<Lancamento> atualizar(@PathVariable Long codigo, @Valid @RequestBody Lancamento lancamento) {
@@ -107,8 +140,6 @@ public class LancamentoResource {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.notFound().build();
 		}
-}
-	
-	
+	}
 
 }
