@@ -20,7 +20,6 @@ import org.thymeleaf.context.Context;
 
 import com.exemplo.algamoney.api.model.Lancamento;
 import com.exemplo.algamoney.api.model.Usuario;
-import com.exemplo.algamoney.api.repository.LancamentoRepository;
 
 @Component
 public class Mailer {
@@ -31,8 +30,8 @@ public class Mailer {
 	@Autowired
 	private TemplateEngine thymeleaf;
 
-	@Autowired
-	private LancamentoRepository repo;
+	//@Autowired
+	//private LancamentoRepository repo;
 
 	@EventListener
 	private void teste(ApplicationReadyEvent event) {
