@@ -6,11 +6,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AlgamoneyApiProperty {
 
 	private final Seguranca seguranca = new Seguranca();
-	
-	private String originPermitida = "http://localhost:8000"; 
-	
+
+	private String originPermitida = "http://localhost:8000";
+
 	private final Mail mail = new Mail();
-	
+
+	private final S3 s3 = new S3();
+
+	public S3 getS3() {
+		return s3;
+	}
+
 	public Mail getMail() {
 		return mail;
 	}
@@ -18,15 +24,43 @@ public class AlgamoneyApiProperty {
 	public Seguranca getSeguranca() {
 		return seguranca;
 	}
-		
+
 	public String getOriginPermitida() {
 		return originPermitida;
 	}
-		
+
 	public void setOriginPermitida(String originPermitida) {
 		this.originPermitida = originPermitida;
 	}
 
+	public static class S3 {
+
+		private String accessKeyId;
+
+		private String secretAccessKey;
+
+		private String bucket = "wn-algamoney-arquivos";
+
+		public String getBucket() {
+			return bucket;
+		}
+
+		public String getAccessKeyId() {
+			return accessKeyId;
+		}
+
+		public void setAccessKeyId(String accessKeyId) {
+			this.accessKeyId = accessKeyId;
+		}
+
+		public String getSecretAccessKey() {
+			return secretAccessKey;
+		}
+
+		public void setSecretAccessKey(String secretAccessKey) {
+			this.secretAccessKey = secretAccessKey;
+		}
+	}
 
 	public static class Seguranca {
 
@@ -41,15 +75,15 @@ public class AlgamoneyApiProperty {
 		}
 
 	}
-	
+
 	public static class Mail {
-		
+
 		private String host;
-		
+
 		private Integer port;
-		
+
 		private String username;
-		
+
 		private String password;
 
 		public String getHost() {
