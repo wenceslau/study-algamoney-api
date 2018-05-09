@@ -1,8 +1,6 @@
 package com.exemplo.algamoney.api.resource;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.exemplo.algamoney.api.dto.Anexo;
 import com.exemplo.algamoney.api.dto.LancamentoEstatisticaCategoria;
 import com.exemplo.algamoney.api.dto.LancamentoEstatisticaDia;
 import com.exemplo.algamoney.api.event.RecursoCriadoEvent;
@@ -45,6 +44,7 @@ import com.exemplo.algamoney.api.repository.filter.LancamentoFilter;
 import com.exemplo.algamoney.api.repository.projection.ResumoLancamento;
 import com.exemplo.algamoney.api.service.LancamentoService;
 import com.exemplo.algamoney.api.service.exception.PessoaInexistenteOuInativoExcpetion;
+import com.exemplo.algamoney.api.storage.S3;
 
 @RestController
 @RequestMapping("/lancamentos")
@@ -62,28 +62,28 @@ public class LancamentoResource {
 	@Autowired
 	private MessageSource messageSource;
 
-	
+	@Autowired
+	private S3 s3;
+
 	@PostMapping("/anexo")
 	@PreAuthorize("hasAuthority('ROLE_CADASTRAR_LANCAMENTO') and #oauth2.hasScope('write')")
-	public String uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
-		OutputStream out = new FileOutputStream(
-				"/home/alexandre/Desktop/anexo--" + anexo.getOriginalFilename());
-		out.write(anexo.getBytes());
-		out.close();
-		return "ok";
+	public Anexo uploadAnexo(@RequestParam MultipartFile anexo) throws IOException {
+//		OutputStream out = new FileOutputStream("/home/alexandre/Desktop/anexo--" + anexo.getOriginalFilename());
+//		out.write(anexo.getBytes());
+//		out.close();
+		String nome = s3.salvarTeporariamente(anexo);
+		return new Anexo(nome, s3.configurarUrl(nome));
 	}
-	
+
 	@GetMapping("/relatorio/por-pessoa")
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
 	public ResponseEntity<byte[]> relatorioPorPessoa(
-			@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate inicio, 
-			@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd")  LocalDate fim) throws Exception{
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate inicio,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fim) throws Exception {
 
-		byte[] relatorio = lancamentoService.relatorioPorPessoa(inicio, fim);	
-		
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
-				.body(relatorio);
+		byte[] relatorio = lancamentoService.relatorioPorPessoa(inicio, fim);
+
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE).body(relatorio);
 	}
 
 	@GetMapping("/estatistica/por-categoria")
