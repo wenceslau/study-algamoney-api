@@ -2,6 +2,7 @@ package com.exemplo.algamoney.api.storage;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
 import com.amazonaws.services.s3.model.Tag;
 import com.exemplo.algamoney.api.config.property.AlgamoneyApiProperty;
 
@@ -59,6 +61,15 @@ public class S3 {
 			throw new RuntimeException("Problemas ao tentar enviar o arquivo para o S3.", e);
 		}
 
+	}
+	
+	public void salvar(String objeto) {
+		SetObjectTaggingRequest setObjectTaggingRequest = new SetObjectTaggingRequest(
+				property.getS3().getBucket(), 
+				objeto, 
+				new ObjectTagging(Collections.emptyList()));
+		
+		amazonS3.setObjectTagging(setObjectTaggingRequest);
 	}
 
 	public String configurarUrl(String objeto) {
